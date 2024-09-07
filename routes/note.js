@@ -25,4 +25,25 @@ router.post(
   noteController.createnote
 );
 
+// GET /notes/:id
+router.get("/notes/:id", noteController.getNote);
+
+// DELETE /delete/:id
+router.delete("/delete/:id", noteController.deleteNote);
+
+//PUT /edit-note/:id
+router.patch(
+  "/edit-note/:id",
+  [
+    body("title")
+      .trim()
+      .isLength({ min: 4 })
+      .withMessage("Title is too short")
+      .isLength({ max: 30 })
+      .withMessage("Title is too long"),
+    body("content").isLength({ min: 5 }).withMessage("Content is too short"),
+  ],
+  noteController.editNote
+);
+
 module.exports = router;
