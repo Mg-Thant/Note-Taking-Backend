@@ -18,7 +18,7 @@ router.post(
       .trim()
       .isLength({ min: 4 })
       .withMessage("Title is too short")
-      .isLength({ max: 30 })
+      .isLength({ max: 100 })
       .withMessage("Title is too long"),
     body("content").isLength({ min: 5 }).withMessage("Content is too short"),
   ],
@@ -31,7 +31,7 @@ router.get("/notes/:id", noteController.getNote);
 // DELETE /delete/:id
 router.delete("/delete/:id", noteController.deleteNote);
 
-//PUT /edit-note/:id
+//patch /edit-note/:id
 router.patch(
   "/edit-note/:id",
   [
@@ -43,7 +43,7 @@ router.patch(
       .withMessage("Title is too long"),
     body("content").isLength({ min: 5 }).withMessage("Content is too short"),
   ],
-  noteController.editNote
+  noteController.updateNote
 );
 
 module.exports = router;

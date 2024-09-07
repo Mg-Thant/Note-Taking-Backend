@@ -80,7 +80,7 @@ exports.deleteNote = (req, res, next) => {
     });
 };
 
-exports.editNote = (req, res, next) => {
+exports.updateNote = (req, res, next) => {
   const errors = validationResult(req);
   const { id } = req.params;
   const { title, content } = req.body;
