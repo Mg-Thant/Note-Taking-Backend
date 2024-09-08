@@ -4,10 +4,24 @@ const Note = require("../models/note");
 const { fileDel } = require("../utils/fileDel");
 
 exports.getNotes = (req, res, next) => {
+  const currentPage = +req.query.page || 1;
+  const notePerPage = 6;
+  let totalNotes;
+
   Note.find()
-    .sort({ createdAt: -1 })
+    .countDocuments()
+    .then((countNotes) => {
+      totalNotes = countNotes;
+      return Note.find()
+        .sort({ createdAt: -1 })
+        .skip((currentPage - 1) * notePerPage)
+        .limit(notePerPage);
+    })
     .then((notes) => {
-      return res.status(200).json(notes);
+      return res.status(200).json({
+        notes,
+        totalNotes,
+      });
     })
     .catch((err) => {
       console.log(err);
