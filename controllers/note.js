@@ -1,7 +1,7 @@
 const { validationResult } = require("express-validator");
 
 const Note = require("../models/note");
-const note = require("../models/note");
+const { fileDel } = require("../utils/fileDel");
 
 exports.getNotes = (req, res, next) => {
   Note.find()
@@ -20,6 +20,7 @@ exports.getNotes = (req, res, next) => {
 exports.createnote = (req, res, next) => {
   const errors = validationResult(req);
   const { title, content } = req.body;
+  const image = req.file;
 
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -31,6 +32,7 @@ exports.createnote = (req, res, next) => {
   Note.create({
     title,
     content,
+    cover_image: image ? image.path : undefined,
   })
     .then((_) => {
       return res.status(201).json({
@@ -66,12 +68,16 @@ exports.getNote = (req, res, next) => {
 exports.deleteNote = (req, res, next) => {
   const { id } = req.params;
 
-  Note.findByIdAndDelete(id)
-    .then(() => {
-      return res.status(204).json({
-        message: "Note Deleted",
+  Note.findById(id)
+    .then((note) => {
+      fileDel(note.cover_image);
+      return Note.findByIdAndDelete(id).then(() => {
+        return res.status(204).json({
+          message: "Note Deleted",
+        });
       });
     })
+
     .catch((err) => {
       console.log(err);
       res.status(404).json({
@@ -82,8 +88,8 @@ exports.deleteNote = (req, res, next) => {
 
 exports.updateNote = (req, res, next) => {
   const errors = validationResult(req);
-  const { id } = req.params;
-  const { title, content } = req.body;
+  const { title, content, note_id } = req.body;
+  const image = req.file;
 
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -92,10 +98,16 @@ exports.updateNote = (req, res, next) => {
     });
   }
 
-  Note.findById(id)
+  Note.findById(note_id)
     .then((note) => {
       note.title = title;
       note.content = content;
+      if (image && note.cover_image) {
+        fileDel(note.cover_image);
+        note.cover_image = image.path;
+      } else {
+        note.cover_image = image.path;
+      }
       return note.save();
     })
     .then(() => {

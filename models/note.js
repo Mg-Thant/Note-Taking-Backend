@@ -17,6 +17,7 @@ const noteSchema = new Schema(
       type: String,
       default: "Anonymous",
     },
+    cover_image: String,
   },
   {
     timestamps: true,

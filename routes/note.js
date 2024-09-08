@@ -31,9 +31,9 @@ router.get("/notes/:id", noteController.getNote);
 // DELETE /delete/:id
 router.delete("/delete/:id", noteController.deleteNote);
 
-//patch /edit-note/:id
+//patch /edit
 router.patch(
-  "/edit-note/:id",
+  "/edit",
   [
     body("title")
       .trim()
