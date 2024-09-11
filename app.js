@@ -8,6 +8,7 @@ const path = require("path");
 dotenv.config();
 
 const noteRoute = require("./routes/note");
+const authRoute = require("./routes/auth");
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use(
 );
 
 app.use(noteRoute);
+app.use(authRoute);
 
 mongoose
   .connect(process.env.MONGODB_URL)
