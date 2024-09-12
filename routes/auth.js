@@ -42,4 +42,15 @@ router.post(
   authController.register
 );
 
+// POST /login
+router.post(
+  "/login",
+  body("email").isEmail().withMessage("Email must be email format!"),
+  body("password")
+    .trim()
+    .isLength({ min: 4 })
+    .withMessage("Password is too short"),
+  authController.login
+);
+
 module.exports = router;
