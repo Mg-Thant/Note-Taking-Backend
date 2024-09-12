@@ -1,5 +1,8 @@
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const User = require("../models/user");
 
@@ -54,7 +57,15 @@ exports.login = (req, res, next) => {
         if (!isMatched) {
           return res.status(401).json({ message: "Invalid user credentials" });
         }
-        return res.status(200).json({ message: "Login successful" });
+        const jwt_token = jwt.sign(
+          { email: user.email, userId: user._id },
+          process.env.JWT_KEY,
+          { expiresIn: "2h" }
+        );
+        return res.status(200).json({
+          token: jwt_token,
+          userId: user._id,
+        });
       });
     })
     .catch((err) => {
