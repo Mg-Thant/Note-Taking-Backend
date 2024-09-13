@@ -15,7 +15,7 @@ const isAuth = (req, res, next) => {
     }
     req.userId = isMatchToken.userId;
     next();
-  } catch (err) {
+  } catch (err) { 
     return res.status(401).json({ message: "User not authenticated!" });
   }
 };

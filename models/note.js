@@ -1,4 +1,4 @@
-const { model, Schema } = require("mongoose");
+const { model, Schema, SchemaType } = require("mongoose");
 
 const noteSchema = new Schema(
   {
@@ -14,8 +14,9 @@ const noteSchema = new Schema(
       minLength: 5,
     },
     creator: {
-      type: String,
-      default: "Anonymous",
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     cover_image: String,
   },

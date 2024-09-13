@@ -3,6 +3,7 @@ const { body } = require("express-validator");
 
 const authController = require("../controllers/auth");
 const User = require("../models/user");
+const isAuth = require("../middlewares/isAuth");
 
 const router = express.Router();
 
@@ -52,5 +53,8 @@ router.post(
     .withMessage("Password is too short"),
   authController.login
 );
+
+// GET /status
+router.get("/status", authController.checkStatus);
 
 module.exports = router;

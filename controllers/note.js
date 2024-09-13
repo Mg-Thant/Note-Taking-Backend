@@ -13,6 +13,7 @@ exports.getNotes = (req, res, next) => {
     .then((countNotes) => {
       totalNotes = countNotes;
       return Note.find()
+        .populate("creator", "username")
         .sort({ createdAt: -1 })
         .skip((currentPage - 1) * notePerPage)
         .limit(notePerPage);
@@ -47,6 +48,7 @@ exports.createnote = (req, res, next) => {
     title,
     content,
     cover_image: image ? image.path : undefined,
+    creator: req.userId,
   })
     .then((_) => {
       return res.status(201).json({
@@ -65,6 +67,7 @@ exports.getNote = (req, res, next) => {
   const { id } = req.params;
 
   Note.findById(id)
+    .populate("creator", "username")
     .then((note) => {
       if (!note) {
         return res.status(404).json({ message: "Note not found" });
@@ -84,7 +87,12 @@ exports.deleteNote = (req, res, next) => {
 
   Note.findById(id)
     .then((note) => {
-      fileDel(note.cover_image);
+      if (note.creator.toString() !== req.userId) {
+        return res.status(401).json("Auth Failed");
+      }
+      if (note.cover_image) {
+        fileDel(note.cover_image);
+      }
       return Note.findByIdAndDelete(id).then(() => {
         return res.status(204).json({
           message: "Note Deleted",
@@ -114,12 +122,15 @@ exports.updateNote = (req, res, next) => {
 
   Note.findById(note_id)
     .then((note) => {
+      if(note.creator.toString() !== req.userId) {
+        return res.status(401).json("Auth Failed")
+      }
       note.title = title;
       note.content = content;
-      if (image && note.cover_image) {
+      if (note.cover_image) {
         fileDel(note.cover_image);
         note.cover_image = image.path;
-      } else {
+      } else if (image && !note.cover_image) {
         note.cover_image = image.path;
       }
       return note.save();

@@ -65,6 +65,7 @@ exports.login = (req, res, next) => {
         return res.status(200).json({
           token: jwt_token,
           userId: user._id,
+          user_email: user.email,
         });
       });
     })
@@ -74,4 +75,23 @@ exports.login = (req, res, next) => {
         message: err.message,
       });
     });
+};
+
+exports.checkStatus = (req, res, next) => {
+  const authHeader = req.get("Authorization");
+  if (!authHeader) {
+    return res.status(401).json({ message: "User not authenticated!" });
+  }
+  const token = authHeader.split(" ")[1];
+  try {
+    const isMatchToken = jwt.verify(token, process.env.JWT_KEY);
+    if (!isMatchToken) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+    req.userId = isMatchToken.userId;
+    res.status(200).json("OK");
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "User not authenticated!" });
+  }
 };
